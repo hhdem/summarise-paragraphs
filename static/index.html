@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Azure OpenAI Paragraph Summarizer</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    h1 {
+      color: #333;
+      text-align: center;
+    }
+
+    textarea {
+      width: 100%;
+      height: 200px;
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      resize: vertical;
+    }
+
+    button {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    #result {
+      margin-top: 20px;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      background-color: #f9f9f9;
+      min-height: 100px;
+    }
+
+    .loading {
+      text-align: center;
+      color: #666;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Azure OpenAI Paragraph Summarizer</h1>
+  <div>
+    <p>Enter the text you want to summarize (processed securely with Azure OpenAI):</p>
+    <textarea id="textInput" placeholder="Paste your paragraph here..."></textarea>
+    <button id="summarizeBtn">Summarize</button>
+  </div>
+  <div>
+    <h2>Summary:</h2>
+    <div id="result">The summary will appear here...</div>
+  </div>
+
+  <script>
+    document.getElementById('summarizeBtn').addEventListener('click', async () => {
+      const text = document.getElementById('textInput').value.trim();
+      const resultDiv = document.getElementById('result');
+
+      if (!text) {
+        resultDiv.textContent = 'Please enter some text to summarize.';
+        return;
+      }
+
+      resultDiv.innerHTML = '<p class="loading">Summarizing...</p>';
+
+      try {
+        const response = await fetch('http://localhost:5000/api/summarize', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ text }),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          resultDiv.textContent = data.summary;
+        } else {
+          resultDiv.textContent = `Error: ${data.error || 'Failed to summarize text'}`;
+        }
+      } catch (error) {
+        resultDiv.textContent = `Error: ${error.message || 'Failed to connect to the server'}`;
+      }
+    });
+  </script>
+</body>
+
+</html>
